@@ -1,0 +1,32 @@
+name: Run Python Script Every 30 Minutes
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+
+jobs:
+  run_script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"  # Replace with your Python version
+
+      - name: Install dependencies
+        run: pip install requests  # Add any other dependencies if needed
+
+      - name: Run Python script and check price
+        id: run_script
+        run: |
+          python fetch_prices.py > output.json  # Replace with your script filename
+          echo "::set-output name=price::$(jq -r '.tankstellen[0].preis.preis' output.json)"
+        continue-on-error: true
+
+      - name: Notify on price below 1.55
+        if: ${{ steps.run_script.outputs.price | float < 1.55 }}
+        run: echo "Price below 1.55 detected at $(date)"
