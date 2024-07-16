@@ -2,7 +2,7 @@ name: Run Python Script Every 30 Minutes
 
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    # - cron: "*/30 * * * *"
 
 jobs:
   run_script:
